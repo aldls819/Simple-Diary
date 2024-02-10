@@ -51,7 +51,7 @@ function App() {
   };
 
   // 일기 삭제 메소드
-  const onDelete = (targetId) => {
+  const onRemove = (targetId) => {
     console.log(`${targetId}가 삭제되었습니다`);
     //삭제하려는 id의 리스트를 제외한 다른 다이어리 리스트들을
     //filter 를 사용해서 새로운 다이어리 리스트 배열을 생성한다
@@ -60,10 +60,21 @@ function App() {
     setData(newDiaryList);
   };
 
+  // 일기 수정 메소드
+  const onEdit = (targetId, newContent) => {
+    setData(
+      //수정 대상의 id의 일기 내용을 수정 후 기존의 일기들과
+      //새로운 배열로 생성하여 setData에 전달한다
+      data.map((it) =>
+        it.id === targetId ? { ...it, content: newContent } : it
+      )
+    );
+  };
+
   return (
     <div className="App">
       <DiaryEditor onCreate={onCreate} />
-      <DiaryList diaryList={data} onDelete={onDelete} />
+      <DiaryList diaryList={data} onRemove={onRemove} onEdit={onEdit} />
     </div>
   );
 }
