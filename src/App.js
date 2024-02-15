@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import "./App.css";
 import DiaryEditor from "./DiaryEditor";
 import DiaryList from "./DiaryList";
 import Lifecycle from "./Lifecycle";
+import OptimizeTest from "./OptimizeTest";
 
 // const dummyList = [
 //   {
@@ -77,7 +78,6 @@ function App() {
 
   // 일기 삭제 메소드
   const onRemove = (targetId) => {
-    console.log(`${targetId}가 삭제되었습니다`);
     //삭제하려는 id의 리스트를 제외한 다른 다이어리 리스트들을
     //filter 를 사용해서 새로운 다이어리 리스트 배열을 생성한다
     const newDiaryList = data.filter((it) => it.id !== targetId);
@@ -96,10 +96,25 @@ function App() {
     );
   };
 
+  //감정점수 분석 함수
+  const getDiaryAnalysis = useMemo(() => {
+    const goodCount = data.filter((it) => it.emotion >= 3).length;
+    const badCount = data.length - goodCount;
+    const goodRatio = (goodCount / data.length) * 100;
+    return { goodCount, badCount, goodRatio };
+  }, [data.length]);
+
+  const { goodCount, badCount, goodRatio } = getDiaryAnalysis;
+
   return (
     <div className="App">
+      <OptimizeTest />
       {/* <Lifecycle /> */}
       <DiaryEditor onCreate={onCreate} />
+      <div>전체 일기 : {data.length}</div>
+      <div>기분 좋은 일기 개수 : {goodCount}</div>
+      <div>기분 나쁜 일기 개수 : {badCount}</div>
+      <div>기분 좋은 일기 비율 : {goodRatio}</div>
       <DiaryList diaryList={data} onRemove={onRemove} onEdit={onEdit} />
     </div>
   );
