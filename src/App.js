@@ -1,42 +1,44 @@
-import { useEffect, useRef, useState, useMemo, useCallback } from "react";
+import { useEffect, useRef, useMemo, useCallback, useReducer } from "react";
 import "./App.css";
 import DiaryEditor from "./DiaryEditor";
 import DiaryList from "./DiaryList";
-import Lifecycle from "./Lifecycle";
 import OptimizeTest from "./OptimizeTest";
 
-// const dummyList = [
-//   {
-//     id: 1,
-//     author: "정지은",
-//     content: "방가방가방가워",
-//     emotion: 5,
-//     //현재 시간 기준 시간 객체 생성
-//     created_date: new Date().getTime(),
-//   },
-//   {
-//     id: 2,
-//     author: "정정정",
-//     content: "방가방가방가워1",
-//     emotion: 3,
-//     //현재 시간 기준 시간 객체 생성
-//     created_date: new Date().getTime(),
-//   },
-//   {
-//     id: 3,
-//     author: "지지지",
-//     content: "방가방가방가워2",
-//     emotion: 4,
-//     //현재 시간 기준 시간 객체 생성
-//     created_date: new Date().getTime(),
-//   },
-// ];
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "INIT": {
+      return action.data;
+    }
+    case "CREATE": {
+      const create_date = new Date().getTime();
+      const newItem = {
+        ...action.data,
+        create_date,
+      };
+      return [newItem, ...state];
+    }
+    case "REMOVE": {
+      return state.filter((it) => it.id !== action.targetId);
+    }
+    case "EDIT": {
+      return state.map((it) =>
+        it.id === action.targetId ? { ...it, content: action.newContent } : it
+      );
+    }
+    default:
+      return state;
+  }
+};
 
 // api  -> https://jsonplaceholder.typicode.com/comments
 
 function App() {
   //일기 데이터 배열 관리
-  const [data, setData] = useState([]);
+  // const [data, setData] = useState([]);
+
+  //reducer
+  const [data, dispatch] = useReducer(reducer, []);
+
   //id 값 할당 변수
   const dataId = useRef(0);
 
@@ -54,8 +56,7 @@ function App() {
         id: dataId.current++,
       };
     });
-
-    setData(initData);
+    dispatch({ type: "INIT", data: initData });
   };
 
   useEffect(() => {
@@ -64,30 +65,21 @@ function App() {
 
   //새로운 일기 작성 메소드
   const onCreate = useCallback((author, content, emotion) => {
-    const created_date = new Date().getTime();
-    const newItem = {
-      author,
-      content,
-      emotion,
-      created_date,
-      id: dataId.current,
-    };
+    dispatch({
+      type: "CREATE",
+      data: { author, content, emotion, id: dataId.current },
+    });
     dataId.current += 1;
-    setData((data) => [newItem, ...data]);
   }, []);
 
   // 일기 삭제 메소드
   const onRemove = useCallback((targetId) => {
-    setData((data) => data.filter((it) => it.id !== targetId));
+    dispatch({ type: "REMOVE", targetId });
   }, []);
 
   // 일기 수정 메소드
   const onEdit = useCallback((targetId, newContent) => {
-    setData((data) =>
-      data.map((it) =>
-        it.id === targetId ? { ...it, content: newContent } : it
-      )
-    );
+    dispatch({ type: "EDIT", targetId, newContent });
   }, []);
 
   //감정점수 분석 함수

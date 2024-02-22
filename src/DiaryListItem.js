@@ -9,9 +9,9 @@ const DiaryListItem = ({
   onRemove,
   onEdit,
 }) => {
-  useEffect(() => {
-    console.log(`${id}번째 렌더링!!!`);
-  });
+  // useEffect(() => {
+  //   console.log(`${id}번째 렌더링!!!`);
+  // });
 
   //수정 state
   const [isEdit, setIsEdit] = useState(false);
