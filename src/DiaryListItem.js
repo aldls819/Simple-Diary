@@ -1,18 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { DiaryDispatchContext } from "./App";
 
-const DiaryListItem = ({
-  id,
-  author,
-  content,
-  emotion,
-  created_date,
-  onRemove,
-  onEdit,
-}) => {
-  // useEffect(() => {
-  //   console.log(`${id}번째 렌더링!!!`);
-  // });
-
+const DiaryListItem = ({ id, author, content, emotion, created_date }) => {
+  const { onRemove, onEdit } = useContext(DiaryDispatchContext);
   //수정 state
   const [isEdit, setIsEdit] = useState(false);
   //토글 반전연산
