@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 const DiaryListItem = ({
   id,
@@ -9,6 +9,10 @@ const DiaryListItem = ({
   onRemove,
   onEdit,
 }) => {
+  useEffect(() => {
+    console.log(`${id}번째 렌더링!!!`);
+  });
+
   //수정 state
   const [isEdit, setIsEdit] = useState(false);
   //토글 반전연산
@@ -81,4 +85,4 @@ const DiaryListItem = ({
   );
 };
 
-export default DiaryListItem;
+export default React.memo(DiaryListItem);

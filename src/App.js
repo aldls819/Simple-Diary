@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import "./App.css";
 import DiaryEditor from "./DiaryEditor";
 import DiaryList from "./DiaryList";
@@ -63,7 +63,7 @@ function App() {
   }, []);
 
   //새로운 일기 작성 메소드
-  const onCreate = (author, content, emotion) => {
+  const onCreate = useCallback((author, content, emotion) => {
     const created_date = new Date().getTime();
     const newItem = {
       author,
@@ -73,28 +73,22 @@ function App() {
       id: dataId.current,
     };
     dataId.current += 1;
-    setData([newItem, ...data]);
-  };
+    setData((data) => [newItem, ...data]);
+  }, []);
 
   // 일기 삭제 메소드
-  const onRemove = (targetId) => {
-    //삭제하려는 id의 리스트를 제외한 다른 다이어리 리스트들을
-    //filter 를 사용해서 새로운 다이어리 리스트 배열을 생성한다
-    const newDiaryList = data.filter((it) => it.id !== targetId);
-    //새로 생성된 다이어리 배열로 data 변경
-    setData(newDiaryList);
-  };
+  const onRemove = useCallback((targetId) => {
+    setData((data) => data.filter((it) => it.id !== targetId));
+  }, []);
 
   // 일기 수정 메소드
-  const onEdit = (targetId, newContent) => {
-    setData(
-      //수정 대상의 id의 일기 내용을 수정 후 기존의 일기들과
-      //새로운 배열로 생성하여 setData에 전달한다
+  const onEdit = useCallback((targetId, newContent) => {
+    setData((data) =>
       data.map((it) =>
         it.id === targetId ? { ...it, content: newContent } : it
       )
     );
-  };
+  }, []);
 
   //감정점수 분석 함수
   const getDiaryAnalysis = useMemo(() => {
